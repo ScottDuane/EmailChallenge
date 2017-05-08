@@ -66,10 +66,7 @@ class Email
 
   def is_legal_header?(start_idx)
     curr_idx = start_idx
-
-    while @raw_email[curr_idx] && (@raw_email[curr_idx] != ":" &&  curr_idx - start_idx - 1 < @max_header_length)
-      curr_idx += 1
-    end
+    curr_idx += 1 while @raw_email[curr_idx] && (@raw_email[curr_idx] != ":" &&  curr_idx - start_idx - 1 < @max_header_length)
 
     return @raw_email[curr_idx] == ":" && @header_hash[@raw_email[start_idx...curr_idx]] ? curr_idx : false
   end
@@ -83,6 +80,10 @@ class Email
 end
 
 describe Email do
+  aol_mail = EmailHelper.new('./email_3.txt')
+  spam_gmail = EmailHelper.new('./email_1.txt')
+  reg_gmail = EmailHelper.new('./email_2.txt')
+
   describe "#remove_double_new_lines_between_headers" do
 
     ## TASK 2 ##
