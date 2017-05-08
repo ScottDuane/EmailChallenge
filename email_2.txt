@@ -1,0 +1,226 @@
+Delivered-To: sduane@appacademy.io
+Received: by 10.103.71.83 with SMTP id u80csp347129vsa;
+        Fri, 5 May 2017 12:04:16 -0700 (PDT)
+X-Received: by 10.13.255.198 with SMTP id p189mr41361287ywf.278.1494011056059;
+        Fri, 05 May 2017 12:04:16 -0700 (PDT)
+Return-Path: <sf+bncBD653VHZ7IJBBL4ZWPEAKGQEMI5T7SA@appacademy.io>
+Received: from mail-yw0-x248.google.com (mail-yw0-x248.google.com. [2607:f8b0:4002:c05::248])
+        by mx.google.com with ESMTPS id q125si2330340ywb.341.2017.05.05.12.04.15
+        for <sduane@appacademy.io>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 May 2017 12:04:15 -0700 (PDT)
+Received-SPF: softfail (google.com: domain of transitioning sf+bncbd653vhz7ijbbl4zwpeakgqemi5t7sa@appacademy.io does not designate 2607:f8b0:4002:c05::248 as permitted sender) client-ip=2607:f8b0:4002:c05::248;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@appacademy.io;
+       spf=softfail (google.com: domain of transitioning sf+bncbd653vhz7ijbbl4zwpeakgqemi5t7sa@appacademy.io does not designate 2607:f8b0:4002:c05::248 as permitted sender) smtp.mailfrom=sf+bncBD653VHZ7IJBBL4ZWPEAKGQEMI5T7SA@appacademy.io
+Received: by mail-yw0-x248.google.com with SMTP id p128sf8794774ywf.14
+        for <sduane@appacademy.io>; Fri, 05 May 2017 12:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=appacademy.io; s=google;
+        h=mime-version:from:date:message-id:subject:to:x-original-sender
+         :x-original-authentication-results:precedence:mailing-list:list-id
+         :x-spam-checked-in-group:list-post:list-help:list-archive
+         :list-subscribe:list-unsubscribe;
+        bh=syXuq6CC9/W4RYqYOo47+Wanb+/HB5qped4R+WGS9W0=;
+        b=mcZuLhnCAX26Pgv9+lYmmfNnwXBeGubJXiYuMIPS3C8f3sSuS603fj81Vxzxg3N1ul
+         gaZqsErSLO+44alouCRPcKYlSRFo8zs0KcVbZKBInPE28BrShBK5ZqzE9+xHAJx1e094
+         m6nk9Ztr9fO3tG62PFdrCNRaYfQ8Pk/KLJuMU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :x-original-sender:x-original-authentication-results:precedence
+         :mailing-list:list-id:x-spam-checked-in-group:list-post:list-help
+         :list-archive:list-subscribe:list-unsubscribe;
+        bh=syXuq6CC9/W4RYqYOo47+Wanb+/HB5qped4R+WGS9W0=;
+        b=V61P1/efVNGsek7AcVQ4dCGyX6mn9/yTuZKoH+jVGEWh/9ISh2zjiNOA9kvAC2enP8
+         cm+/1GEDB2Rc9hV/DUXifYBvNzdOrufpueYB1meKZxjBUA8cHAYIRb0hj3+6L9tO07d/
+         7l4+LKjzg220ThM4L21fRsM4AQF1wmK9AkRFDukck22e6KI12KXW4KOlp1RUJJUpgVDD
+         lJZh5Bt67FHsS1ECfuXza9S23vCdYGKXGqL3jV5s/lmMJYeLqM56VU3wNxAh2qVeHWDq
+         xfZO1Do/k7V9B8f796HWEhlPQLKrVzTJlPMveL9NZSn/Z++uGnswAem26GvA7teNAhYU
+         uWJA==
+X-Gm-Message-State: AN3rC/6FesMYrBqTp/cIFgTMs3hRYxSXxhN4PFmRx8Tv4GcwyIjrlsh/ 9nqZUCpZ7qAIZw==
+X-Received: by 10.129.74.138 with SMTP id x132mr20781440ywa.27.1494011055650;
+        Fri, 05 May 2017 12:04:15 -0700 (PDT)
+X-BeenThere: sf@appacademy.io
+Received: by 10.107.46.130 with SMTP id u2ls2839305iou.43.gmail; Fri, 05 May 2017 12:04:15 -0700 (PDT)
+X-Received: by 10.98.61.91 with SMTP id k88mr18669255pfa.62.1494011055041;
+        Fri, 05 May 2017 12:04:15 -0700 (PDT)
+Received: from mail-pf0-x234.google.com (mail-pf0-x234.google.com. [2607:f8b0:400e:c00::234])
+        by mx.google.com with ESMTPS id p7si6327751pli.174.2017.05.05.12.04.14
+        for <sf@appacademy.io>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 May 2017 12:04:14 -0700 (PDT)
+Received-SPF: softfail (google.com: domain of transitioning vmonarrez@appacademy.io does not designate 2607:f8b0:400e:c00::234 as permitted sender) client-ip=2607:f8b0:400e:c00::234;
+Received: by mail-pf0-x234.google.com with SMTP id v14so6623305pfd.2
+        for <sf@appacademy.io>; Fri, 05 May 2017 12:04:14 -0700 (PDT)
+X-Received: by 10.84.169.67 with SMTP id g61mr61149429plb.81.1494011054571; Fri, 05 May 2017 12:04:14 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 10.100.163.74 with HTTP; Fri, 5 May 2017 12:04:14 -0700 (PDT)
+From: Vanessa Monarrez <vmonarrez@appacademy.io>
+Date: Fri, 5 May 2017 12:04:14 -0700
+Message-ID: <CAJbJcJPHVMSgaxGXSKhbGhm8eNOY65VLF4FBqJtG-jdnjHufFA@mail.gmail.com>
+Subject: 160 Spear Stairwell Signage Graffiti
+To: undisclosed-recipients:;
+Content-Type: multipart/mixed; boundary=94eb2c1447f633f24d054ecb8e36
+Bcc: sf@appacademy.io
+X-Original-Sender: vmonarrez@appacademy.io
+X-Original-Authentication-Results: mx.google.com;
+       dkim=pass header.i=@appacademy.io;
+       spf=softfail (google.com: domain of transitioning vmonarrez@appacademy.io does not designate 2607:f8b0:400e:c00::234 as permitted sender) smtp.mailfrom=vmonarrez@appacademy.io
+Precedence: list
+Mailing-list: list sf@appacademy.io; contact sf+owners@appacademy.io
+List-ID: <sf.appacademy.io>
+X-Spam-Checked-In-Group: sf@appacademy.io
+X-Google-Group-Id: 396402392067
+List-Post: <https://groups.google.com/a/appacademy.io/group/sf/post>, <mailto:sf@appacademy.io>
+List-Help: <https://support.google.com/a/appacademy.io/bin/topic.py?topic=25838>, <mailto:sf+help@appacademy.io>
+List-Archive: <https://groups.google.com/a/appacademy.io/group/sf/>
+List-Subscribe: <https://groups.google.com/a/appacademy.io/group/sf/subscribe>, <mailto:sf+subscribe@appacademy.io>
+List-Unsubscribe: <mailto:googlegroups-manage+396402392067+unsubscribe@googlegroups.com>, <https://groups.google.com/a/appacademy.io/group/sf/subscribe>
+
+--94eb2c1447f633f24d054ecb8e36
+Content-Type: multipart/alternative; boundary=94eb2c1447f633f248054ecb8e34
+
+--94eb2c1447f633f248054ecb8e34
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hello everyone,
+
+
+
+After performing a walkthrough of the stairwells, Tishman Speyer has
+discovered their signage is being defaced by someone in the building.  They
+will be patrolling the stairwells more frequently now and would like your
+help with finding the individual destroying the building=E2=80=99s property=
+.
+
+
+
+*These stairwells are for use in case of emergency only.  The building has
+been allowing use of the stairwells to decrease the wait time in the
+elevators but if they continue to see this defacement of property, they
+will cut off access to the stairwells entirely.*
+
+
+
+They ask that users of the stairwells keep an eye out for anyone doing
+this.
+
+
+
+Thank you.
+
+--=20
+Vanessa Monarrez
+Operations Associate
+vmonarrez@appacademy.io
+
+=E1=90=A7
+
+--=20
+You received this message because you are subscribed to the Google Groups "=
+SF Staff" group.
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to sf+unsubscribe@appacademy.io.
+To post to this group, send email to sf@appacademy.io.
+To view this discussion on the web visit https://groups.google.com/a/appaca=
+demy.io/d/msgid/sf/CAJbJcJPHVMSgaxGXSKhbGhm8eNOY65VLF4FBqJtG-jdnjHufFA%40ma=
+il.gmail.com.
+
+--94eb2c1447f633f248054ecb8e34
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><span style=3D"font-size:12.800000190734863px">Hello every=
+one,</span><br><p class=3D"MsoNormal" style=3D"font-size:12.800000190734863=
+px"><u></u>=C2=A0<u></u></p><p class=3D"MsoNormal" style=3D"font-size:12.80=
+0000190734863px">After performing a walkthrough of the stairwells, Tishman =
+Speyer has discovered their signage is being defaced by someone in the buil=
+ding.=C2=A0 They will be patrolling the stairwells more frequently now and =
+would like your help with finding the individual destroying the building=E2=
+=80=99s property.<u></u><u></u></p><p class=3D"MsoNormal" style=3D"font-siz=
+e:12.800000190734863px"><u></u>=C2=A0<u></u></p><p class=3D"MsoNormal" styl=
+e=3D"font-size:12.800000190734863px"><b><u>These stairwells are for use in =
+case of emergency only.=C2=A0 The building has been allowing use of the sta=
+irwells to decrease the wait time in the elevators but if they continue to =
+see this defacement of property, they will cut off access to the stairwells=
+ entirely.<u></u><u></u></u></b></p><p class=3D"MsoNormal" style=3D"font-si=
+ze:12.800000190734863px"><u></u>=C2=A0<u></u></p><p class=3D"MsoNormal" sty=
+le=3D"font-size:12.800000190734863px">They ask that users of the stairwells=
+ keep an eye out for anyone doing this.=C2=A0<u></u></p><p class=3D"MsoNorm=
+al" style=3D"font-size:12.800000190734863px"><u></u>=C2=A0<u></u></p><p cla=
+ss=3D"MsoNormal" style=3D"font-size:12.800000190734863px">Thank you.</p><di=
+v><br></div>-- <br><div class=3D"gmail_signature"><div dir=3D"ltr"><div><di=
+v dir=3D"ltr"><div><div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div =
+dir=3D"ltr"><div dir=3D"ltr">Vanessa Monarrez</div><div dir=3D"ltr">Operati=
+ons Associate</div><div dir=3D"ltr"><a href=3D"mailto:vmonarrez@appacademy.=
+io" target=3D"_blank">vmonarrez@appacademy.io</a><br><div><span></span><spa=
+n></span><div><br></div></div></div></div></div></div></div></div></div></d=
+iv></div></div>
+</div><div hspace=3D"streak-pt-mark" style=3D"max-height:1px"><img alt=3D""=
+ style=3D"width:0px;max-height:0px;overflow:hidden" src=3D"https://mailfoog=
+ae.appspot.com/t?sender=3Dadm1vbmFycmV6QGFwcGFjYWRlbXkuaW8%3D&amp;type=3Dze=
+rocontent&amp;guid=3Dccfb2f38-1547-41af-8297-fc1949b25354"><font color=3D"#=
+ffffff" size=3D"1">=E1=90=A7</font></div>
+
+<p></p>
+
+-- <br />
+You received this message because you are subscribed to the Google Groups &=
+quot;SF Staff&quot; group.<br />
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to <a href=3D"mailto:sf+unsubscribe@appacademy.io">sf+unsubscribe@appa=
+cademy.io</a>.<br />
+To post to this group, send email to <a href=3D"mailto:sf@appacademy.io">sf=
+@appacademy.io</a>.<br />
+To view this discussion on the web visit <a href=3D"https://groups.google.c=
+om/a/appacademy.io/d/msgid/sf/CAJbJcJPHVMSgaxGXSKhbGhm8eNOY65VLF4FBqJtG-jdn=
+jHufFA%40mail.gmail.com?utm_medium=3Demail&utm_source=3Dfooter">https://gro=
+ups.google.com/a/appacademy.io/d/msgid/sf/CAJbJcJPHVMSgaxGXSKhbGhm8eNOY65VL=
+F4FBqJtG-jdnjHufFA%40mail.gmail.com</a>.<br />
+
+--94eb2c1447f633f248054ecb8e34--
+--94eb2c1447f633f24d054ecb8e36
+Content-Type: image/jpeg; name="7 sign.jpg"
+Content-Disposition: attachment; filename="7 sign.jpg"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j2c7ij9s0
+
+
+--94eb2c1447f633f24d054ecb8e36
+Content-Type: image/jpeg; name="7th floor SFFD phone jack.jpg"
+Content-Disposition: attachment; filename="7th floor SFFD phone jack.jpg"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j2c7ijav1
+
+
+--94eb2c1447f633f24d054ecb8e36
+Content-Type: image/jpeg; name="9 stair A.JPG"
+Content-Disposition: attachment; filename="9 stair A.JPG"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j2c7ijbg2
+
+
+--94eb2c1447f633f24d054ecb8e36
+Content-Type: image/jpeg; name="9.jpg"
+Content-Disposition: attachment; filename="9.jpg"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j2c7ijbz3
+
+
+--94eb2c1447f633f24d054ecb8e36
+Content-Type: image/jpeg; name="9B.JPG"
+Content-Disposition: attachment; filename="9B.JPG"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j2c7ijch4
+
+
+--94eb2c1447f633f24d054ecb8e36
+Content-Type: image/jpeg; name="9C.JPG"
+Content-Disposition: attachment; filename="9C.JPG"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j2c7ijd05
+
+
+--94eb2c1447f633f24d054ecb8e36--
