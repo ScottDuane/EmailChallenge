@@ -1,7 +1,5 @@
 require "minitest/autorun"
 require "minitest/reporters"
-require "minitest/benchmark"
-require "rspec-benchmark"
 require "./email_helper.rb"
 
 
@@ -40,19 +38,36 @@ class Email
     body_found = false
 
     until body_found
-      newline_bounds = get_newline_bounds(idx)
-      full_header += @raw_email[idx+1...newline_bounds[0]]
-      colon_idx = is_legal_header?(newline_bounds[1])
+      #up here, do a check that the header is valid and reassign idx
 
-      if !!colon_idx
-        parsed_newline = parse_into_legal_newline(newline_bounds)
-        full_header += parsed_newline
-        full_header += @raw_email[newline_bounds[1]..colon_idx]
-        idx = colon_idx
+      parsed_header_value = parse_header_value(idx)
+
+      if !!parse_header_value
+        full_header += parsed_header_value[0]
+        colon_idx = is_legal_header?(parsed_header_value[1])
+        if !!colon_idx
+          full_header += @raw_email[idx..colon_idx]
+          idx = colon_idx
+        else
+          body_found = true
+        end
       else
         body_found = true
-        idx = newline_bounds[0]
+        # may need to reassign idx in here
       end
+      # newline_bounds = get_newline_bounds(idx)
+      # full_header += @raw_email[idx+1...newline_bounds[0]]
+      # colon_idx = is_legal_header?(newline_bounds[1])
+      #
+      # if !!colon_idx
+      #   parsed_newline = parse_into_legal_newline(newline_bounds)
+      #   full_header += parsed_newline
+      #   full_header += @raw_email[newline_bounds[1]..colon_idx]
+      #   idx = colon_idx
+      # else
+      #   body_found = true
+      #   idx = newline_bounds[0]
+      # end
     end
 
     parsed_email = full_header + @raw_email[idx...@raw_email.length]
@@ -80,6 +95,38 @@ class Email
     # this part needs some work...how do we parse in general?
     return "\n" if @raw_email[bounds[0]] == "\n"
     return "\r\n" if @raw_email[bounds[0]] == "\r"
+  end
+
+  def parse_header_value(start_idx)
+    char_count = 0
+    partial_header = ""
+    idx = start_idx
+
+    until char_count > 998
+      if @raw_email[idx..idx+1] == "\n\n" || @raw_email[idx..idx+3] == "\r\n\r\n"
+        next_line_idx = @raw_email[idx] == "\r" ? idx + 4 : idx + 2
+        partial_header = @raw_email[idx] == "\r" ? partial_header + "\r\n" : partial_header + "\n"
+        return [partial_header, next_line_idx] unless @raw_email[next_line_idx] =~ /[\s\S]/
+
+        char_count += next_line_idx - idx
+        idx = next_line_idx
+      elsif @raw_email[idx] == "\n" || @raw_email[idx..idx+1] == "\r\n"
+        next_line_idx = @raw_email[idx] == "\r" ? idx + 2 : idx + 1
+        partial_header = @raw_email[idx] == "\r" ? partial_header + "\r\n" : partial_header + "\n"
+
+        return [partial_header, next_line_idx] unless @raw_email[next_line_idx] =~ /[\s\S]/
+
+        char_count += next_line_idx - idx
+        idx = next_line_idx
+      else
+        char_count += 1
+        puts "idx is #{idx}"
+        partial_header += @raw_email[idx]
+        idx += 1
+      end
+    end
+
+    false
   end
 end
 
