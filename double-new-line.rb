@@ -8,11 +8,31 @@ Minitest::Reporters.use!
 class Email
   attr_accessor :raw_email
 
-  VALID_HEADERS = ["From", "To", "Subject", "Delivered-To", "Received", "X-Received",
-                   "Return-Path", "Received-SPF", "Authentication-Results", "DKIM-Signature",
-                   "X-MSFBL", "Message-ID", "Date", "Content-Type", "MIME-Version", "X-Transport",
-                   "guid", "X-Trulia-Platform", "X-Sent-Using", "X-Trulia-Campaign", "X-Trulia-PayloadId",
-                   "Reply-To", "Feedback-ID", "List-Unsubscribe", "List-Id"] # assume this list will expand to 100+ values
+  VALID_HEADERS = ["From",
+                   "To",
+                   "Subject",
+                   "Delivered-To",
+                   "Received",
+                   "X-Received",
+                   "Return-Path",
+                   "Received-SPF",
+                   "Authentication-Results",
+                   "DKIM-Signature",
+                   "X-MSFBL",
+                   "Message-ID",
+                   "Date",
+                   "Content-Type",
+                   "MIME-Version",
+                   "X-Transport",
+                   "guid",
+                   "X-Trulia-Platform",
+                   "X-Sent-Using",
+                   "X-Trulia-Campaign",
+                   "X-Trulia-PayloadId",
+                   "Reply-To",
+                   "Feedback-ID",
+                   "List-Unsubscribe",
+                   "List-Id"]
   NEWLINE_PATTERNS = ["\n", "\r\n"]
 
   def initialize(raw_email: nil)
@@ -32,55 +52,29 @@ class Email
   def remove_double_new_lines_between_headers
     idx = is_legal_header?(0)
 
-    raise "Malformed header" unless !!idx
+    raise StandardError, "Malformed header" unless !!idx
 
     full_header = @raw_email[0..idx]
     body_found = false
 
     until body_found
-      #up here, do a check that the header is valid and reassign idx
-
-      parsed_header_value = parse_header_value(idx)
-
-      if !!parse_header_value
-        full_header += parsed_header_value[0]
-        colon_idx = is_legal_header?(parsed_header_value[1])
-        if !!colon_idx
-          full_header += @raw_email[idx..colon_idx]
-          idx = colon_idx
-        else
-          body_found = true
-        end
-      else
+      parsed_header_value = parse_header_value(idx + 1)
+      full_header += parsed_header_value[0]
+      idx = parsed_header_value[1]
+      colon_idx = is_legal_header?(idx)
+      if !!colon_idx
+        full_header += @raw_email[idx..colon_idx]
+        idx = colon_idx
+      elsif !!parsed_header_value[2]
+        full_header += parsed_header_value[2]
         body_found = true
-        # may need to reassign idx in here
+      else
+        raise StandardError, "Malformed header" unless parsed_header_value[2]
       end
-      # newline_bounds = get_newline_bounds(idx)
-      # full_header += @raw_email[idx+1...newline_bounds[0]]
-      # colon_idx = is_legal_header?(newline_bounds[1])
-      #
-      # if !!colon_idx
-      #   parsed_newline = parse_into_legal_newline(newline_bounds)
-      #   full_header += parsed_newline
-      #   full_header += @raw_email[newline_bounds[1]..colon_idx]
-      #   idx = colon_idx
-      # else
-      #   body_found = true
-      #   idx = newline_bounds[0]
-      # end
     end
 
     parsed_email = full_header + @raw_email[idx...@raw_email.length]
     @raw_email = parsed_email
-  end
-
-  def get_newline_bounds(start_idx)
-    start_idx += 1 until @raw_email[start_idx] == "\n" || @raw_email[start_idx] == "\r"
-
-    stop_idx = start_idx
-    stop_idx += 1 while @raw_email[stop_idx] == "\n" || @raw_email[stop_idx] == "\r"
-
-    [start_idx, stop_idx]
   end
 
   def is_legal_header?(start_idx)
@@ -90,23 +84,25 @@ class Email
     return @raw_email[curr_idx] == ":" && @header_hash[@raw_email[start_idx...curr_idx]] ? curr_idx : false
   end
 
-  def parse_into_legal_newline(bounds)
-    return @raw_email[bounds[0]] if bounds[0] == bounds[1]
-    # this part needs some work...how do we parse in general?
-    return "\n" if @raw_email[bounds[0]] == "\n"
-    return "\r\n" if @raw_email[bounds[0]] == "\r"
-  end
-
   def parse_header_value(start_idx)
     char_count = 0
     partial_header = ""
     idx = start_idx
 
     until char_count > 998
-      if @raw_email[idx..idx+1] == "\n\n" || @raw_email[idx..idx+3] == "\r\n\r\n"
-        next_line_idx = @raw_email[idx] == "\r" ? idx + 4 : idx + 2
-        partial_header = @raw_email[idx] == "\r" ? partial_header + "\r\n" : partial_header + "\n"
-        return [partial_header, next_line_idx] unless @raw_email[next_line_idx] =~ /[\s\S]/
+      if @raw_email[idx..idx+1] == "\n\n"
+        next_line_idx = idx + 2
+        partial_header += "\n"
+        next_char = @raw_email[next_line_idx]
+        return [partial_header, next_line_idx, "\n"] unless next_char == " " || next_char == "\t"
+
+        char_count += next_line_idx - idx
+        idx = next_line_idx
+      elsif @raw_email[idx..idx+3] == "\r\n\r\n"
+        next_line_idx = idx + 4
+        partial_header += "\r\n"
+        next_char = @raw_email[next_line_idx]
+        return [partial_header, next_line_idx, "\r\n"] unless next_char == " " || next_char == "\t"
 
         char_count += next_line_idx - idx
         idx = next_line_idx
@@ -114,19 +110,18 @@ class Email
         next_line_idx = @raw_email[idx] == "\r" ? idx + 2 : idx + 1
         partial_header = @raw_email[idx] == "\r" ? partial_header + "\r\n" : partial_header + "\n"
 
-        return [partial_header, next_line_idx] unless @raw_email[next_line_idx] =~ /[\s\S]/
+        return [partial_header, next_line_idx, false] unless @raw_email[next_line_idx] == " "
 
         char_count += next_line_idx - idx
         idx = next_line_idx
       else
         char_count += 1
-        puts "idx is #{idx}"
         partial_header += @raw_email[idx]
         idx += 1
       end
     end
 
-    false
+    raise StandardError, "Malformed header"
   end
 end
 
@@ -171,22 +166,57 @@ describe Email do
         expected  = "From: \"Cliff Clavin\"<cliff@cheers.com>\r\nTo: \"Randall Flagg\" <walkindude@lasvegas.com>\r\nSubject: What! What!\r\n\r\nMade it!!!!\r\n\r\nYay!"
         assert_equal expected, Email.new(raw_email: raw_email).remove_double_new_lines_between_headers
       end
+
     end
 
     ## TASK 6 ##
 
-    describe "raw_email contains folded headers" do
-      it "replaces folded headers with single newlines" do
-        raw_email = EmailHelper.new('/spec/test_emails/email_1.txt').raw_email
+    describe "raw_email has a malformed header" do
+      it "raises an error when the body is not preceded by a double newline" do
+        raw_email = "From: \"Cliff Clavin\"<cliff@cheers.com>\r\n\r\nTo: \"Randall Flagg\" <walkindude@lasvegas.com>\r\n\r\nSubject: What! What!\r\nMade it!!!!\r\n\r\nYay!"
+        proc { Email.new(raw_email: raw_email).remove_double_new_lines_between_headers }.must_raise StandardError, "Malformed header"
+      end
 
-        email_parser = Email.new(raw_email: raw_email)
-      #  puts email_parser.remove_double_new_lines_between_headers
-        assert_equal raw_email, email_parser.remove_double_new_lines_between_headers
+      it "raises an error when the first header is not valid" do
+        raw_email = "Fromm: \"Cliff Clavin\"<cliff@cheers.com>\r\n\r\nTo: \"Randall Flagg\" <walkindude@lasvegas.com>\r\n\r\nSubject: What! What!\r\n\r\nMade it!!!!\r\n\r\nYay!"
+        proc { Email.new(raw_email: raw_email).remove_double_new_lines_between_headers }.must_raise StandardError, "Malformed header"
+      end
+
+      it "raises an error when a header other than the first is not valid" do
+        raw_email = "From: \"Cliff Clavin\"<cliff@cheers.com>\r\nTp: \"Randall Flagg\" <walkindude@lasvegas.com>\r\nSubject: What! What!\r\n\r\nMade it!!!!\r\n\r\nYay!"
+        proc { email = Email.new(raw_email: raw_email).remove_double_new_lines_between_headers }.must_raise StandardError, "Malformed header"
+      end
+
+      it "breaks out of the header early when double newlines follow incorrect header" do
+        raw_email = "From: \"Cliff Clavin\"<cliff@cheers.com>\r\n\r\nTo: \"Randall Flagg\" <walkindude@lasvegas.com>\r\n\r\nSubjokt: What! What!\r\n\r\nMade it!!!!\r\n\r\nYay!"
+        email = Email.new(raw_email: raw_email).remove_double_new_lines_between_headers
+        expected = "From: \"Cliff Clavin\"<cliff@cheers.com>\r\nTo: \"Randall Flagg\" <walkindude@lasvegas.com>\r\n\r\nSubjokt: What! What!\r\n\r\nMade it!!!!\r\n\r\nYay!"
+        assert_equal email, expected
       end
     end
-    # Raise an error if the header is malformed
-    # Read in some emails from different sources and make sure timing is good
-    # candidate to provide additional tests as necessary...
+
+    describe "raw_email contains folded headers" do
+      it "replaces double newlines in folded headers with single newlines" do
+        raw_email = "Delivered-To: adrian.scott.duane@gmail.com\nReceived: by 10.237.61.142 with SMTP id i14csp775851qtf;\n\n  Sat, 6 May 2017 11:19:14 -0700 (PDT)\n\n X-Received: by 10.98.40.4 with SMTP id o4mr22962811pfo.113.1494094754150;\n\n  Sat, 06 May 2017 11:19:14 -0700 (PDT)\n\nNow we're in the body"
+        email = Email.new(raw_email: raw_email).remove_double_new_lines_between_headers
+        expected = "Delivered-To: adrian.scott.duane@gmail.com\nReceived: by 10.237.61.142 with SMTP id i14csp775851qtf;\n  Sat, 6 May 2017 11:19:14 -0700 (PDT)\n X-Received: by 10.98.40.4 with SMTP id o4mr22962811pfo.113.1494094754150;\n  Sat, 06 May 2017 11:19:14 -0700 (PDT)\n\nNow we're in the body"
+        assert_equal email, expected
+      end
+
+      it "replaces CRLF-style double newlines in folded headers" do
+        raw_email = "Delivered-To: adrian.scott.duane@gmail.com\nReceived: by 10.237.61.142 with SMTP id i14csp775851qtf;\r\n\r\n  Sat, 6 May 2017 11:19:14 -0700 (PDT)\r\n\r\n X-Received: by 10.98.40.4 with SMTP id o4mr22962811pfo.113.1494094754150;\r\n\r\n  Sat, 06 May 2017 11:19:14 -0700 (PDT)\n\nNow we're in the body"
+        email = Email.new(raw_email: raw_email).remove_double_new_lines_between_headers
+        expected = "Delivered-To: adrian.scott.duane@gmail.com\nReceived: by 10.237.61.142 with SMTP id i14csp775851qtf;\r\n  Sat, 6 May 2017 11:19:14 -0700 (PDT)\r\n X-Received: by 10.98.40.4 with SMTP id o4mr22962811pfo.113.1494094754150;\r\n  Sat, 06 May 2017 11:19:14 -0700 (PDT)\n\nNow we're in the body"
+        assert_equal email, expected
+      end
+
+      it "handles folded headers that are folded with tabbed whitespace" do
+        raw_email = "Delivered-To: adrian.scott.duane@gmail.com\nReceived: by 10.237.61.142 with SMTP id i14csp775851qtf;\r\n\r\n\tSat, 6 May 2017 11:19:14 -0700 (PDT)\r\n\r\n    X-Received: by 10.98.40.4 with SMTP id o4mr22962811pfo.113.1494094754150;\r\n\r\n   Sat, 06 May 2017 11:19:14 -0700 (PDT)\n\nNow we're in the body"
+        email = Email.new(raw_email: raw_email).remove_double_new_lines_between_headers
+        expected = "Delivered-To: adrian.scott.duane@gmail.com\nReceived: by 10.237.61.142 with SMTP id i14csp775851qtf;\r\n\tSat, 6 May 2017 11:19:14 -0700 (PDT)\r\n    X-Received: by 10.98.40.4 with SMTP id o4mr22962811pfo.113.1494094754150;\r\n   Sat, 06 May 2017 11:19:14 -0700 (PDT)\n\nNow we're in the body"
+        assert_equal email, expected
+      end
+    end
 
   end
 end
