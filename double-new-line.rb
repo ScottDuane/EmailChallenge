@@ -1,6 +1,10 @@
 require "minitest/autorun"
 require "minitest/reporters"
-require "minitest/benchmark" if ENV["BENCH"]
+require "minitest/benchmark"
+require "rspec-benchmark"
+require "./email_helper.rb"
+
+
 Minitest::Reporters.use!
 
 class Email
@@ -80,9 +84,6 @@ class Email
 end
 
 describe Email do
-  aol_mail = EmailHelper.new('./email_3.txt')
-  spam_gmail = EmailHelper.new('./email_1.txt')
-  reg_gmail = EmailHelper.new('./email_2.txt')
 
   describe "#remove_double_new_lines_between_headers" do
 
@@ -127,16 +128,13 @@ describe Email do
 
     ## TASK 6 ##
 
-    describe "Meme Benchmark" do
-      raw_email = "From: \"Cliff Clavin\"<cliff@cheers.com>\r\n\r\nTo: \"Randall Flagg\" <walkindude@lasvegas.com>\r\n\r\nSubject: What! What!\r\n\r\nMade it!!!!\r\n\r\nYay!"
-      email = Email.new(raw_email: raw_email)
+    describe "raw_email contains folded headers" do
+      it "replaces folded headers with single newlines" do
+        raw_email = EmailHelper.new('/spec/test_emails/email_1.txt').raw_email
 
-      if ENV["BENCH"] then
-        bench_performance_linear "remove_double_new_lines_between_headers", 0.9999 do |n|
-          100.times do
-            email.remove_double_new_lines_between_headers
-          end
-        end
+        email_parser = Email.new(raw_email: raw_email)
+      #  puts email_parser.remove_double_new_lines_between_headers
+        assert_equal raw_email, email_parser.remove_double_new_lines_between_headers
       end
     end
     # Raise an error if the header is malformed
