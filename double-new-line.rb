@@ -1,13 +1,12 @@
 require "minitest/autorun"
 require "minitest/reporters"
-require "./email_helper.rb"
-
 
 Minitest::Reporters.use!
 
 class Email
   attr_accessor :raw_email
 
+  # Added a few more to this list to accommodate the emails used in performance_spec.rb
   VALID_HEADERS = ["From",
                    "To",
                    "Subject",
@@ -33,7 +32,6 @@ class Email
                    "Feedback-ID",
                    "List-Unsubscribe",
                    "List-Id"]
-  NEWLINE_PATTERNS = ["\n", "\r\n"]
 
   def initialize(raw_email: nil)
     @raw_email = raw_email

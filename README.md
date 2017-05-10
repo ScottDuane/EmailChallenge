@@ -38,4 +38,4 @@ Space complexity is also on the order of `O(number of characters in header)` wit
 
 ### Testing
 
-In addition to the tests for a number of cases included in `double-new-line.rb`, there's also a performance spec that you can run with `rspec`. This tests the runtime and scaling power of this method, with some emails that are the size of a typical email we might see in production (the samples are taken from a couple of my own email inboxes).
+In addition to the tests for a number of cases included in `double-new-line.rb`, there's also a performance spec that you can run with `rspec`. This tests the runtime and scaling power of this method, with some emails that are the size of a typical email we might see in production (the samples are taken from a couple of my own email inboxes). Warning: the `performance_spec` will take quite awhile to run.
